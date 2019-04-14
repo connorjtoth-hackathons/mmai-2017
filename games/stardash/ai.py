@@ -260,7 +260,7 @@ class AI(BaseAI):
     def buyFleet(self):
         player = self.player
         planet_x = player.home_base.x
-        planet_x = player.home_base.y
+        planet_y = player.home_base.y
         planet_radius = player.home_base.radius
         spawn_x = planet_x+(planet_radius if planet_x<0 else 0-planet_radius)
         while(player.home_base.amount>200):
