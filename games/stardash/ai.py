@@ -120,9 +120,16 @@ class AI(BaseAI):
                 min_dist = dist
                 min_asteroid = asteroid
         return min_asteroid
-
-        pass
     
+    # Return to planet function
+    def travel_towards_base_direct(self, unit):
+        home_base = unit.owner().home_base()
+        
+
+
+    ## TOTH  HELPER FUNCTIONS ^^^^^^
+    ## SAUER HELPER FUNCTIONS VVVVVV
+
 
 
     # <<-- /Creer-Merge: functions -->>
