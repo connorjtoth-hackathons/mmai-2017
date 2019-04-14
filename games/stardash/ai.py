@@ -77,4 +77,22 @@ class AI(BaseAI):
 
     # <<-- Creer-Merge: functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
     # if you need additional functions for your AI you can add them here
+
+
+
+
+    def turns_to_mine_mythicite(self):
+        """ Returns bool: if we can mine mythicite"""
+        if self.game().turns_to_orbit():
+            pass
+            
+
+    # Closest X type of asteroid to the miner
+    def closest_asteroid_to_miner(self, miner, asteroid_type=None):
+        """
+        """
+        pass
+    
+
+
     # <<-- /Creer-Merge: functions -->>
