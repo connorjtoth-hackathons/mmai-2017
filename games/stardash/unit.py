@@ -20,7 +20,7 @@ class Unit(GameObject):
         """Initializes a Unit with basic logic as provided by the Creer code generator."""
         GameObject.__init__(self)
 
-        # private attributes to hold the properties so they appear read only
+        # private attributes  to hold the properties so they appear read only
         self._acted = False
         self._dash_x = 0
         self._dash_y = 0
@@ -250,4 +250,10 @@ class Unit(GameObject):
 
     # <<-- Creer-Merge: functions -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
     # if you want to add any client side logic (such as state checking functions) this is where you can add them
+
+    def capacity_left(self):
+        return self.job().carry_capacity() - sum([self.genarium(),
+                                                  self.rarium(),
+                                                  self.legendarium(),
+                                                  self.mythicite()])
     # <<-- /Creer-Merge: functions -->>

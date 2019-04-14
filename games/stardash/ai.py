@@ -42,6 +42,15 @@ class AI(BaseAI):
             game. You can initialize your AI here.
         """
         # <<-- Creer-Merge: start -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        
+        # track if it is at the target asteroid
+        # status: returning, arriving, mining
+        
+        # maps (unit) -> (asteroid) that it should be mining or (unit) -> (base) if returning
+        self.targets = {unit : None for unit in self.player().units()}
+        
+        
+        
         # replace with your start logic
         # <<-- /Creer-Merge: start -->>
 
@@ -74,6 +83,50 @@ class AI(BaseAI):
         for unit in player.units:
             pass
         # <<-- Creer-Merge: runTurn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
+        
+        # 
+        for unit in player().units():
+            if unit.job().title() == 'miner':
+                # mining logic
+                target = self.targets[unit]
+
+                if not target:
+                    choice = None
+                    choices = ['legendarium','rarium','genarium', None] if turns_to_mine_mythicite() > 1 else ['mythicite', 'legendarium','rarium','genarium', None]
+                    for oretype in ['legendarium','rarium','genarium', None]:
+                        if choice:
+                            break
+                        else:
+                        choice = closest_asteroid_to_position((unit.x(), unit.y()), n=3, asteroid_type=oretype, min_res=20)
+                    self.targets[unit] = choice
+
+                # target is now set
+
+                # first, we try to reach the target if we are not with it anymore
+                if not self.distance_between(unit, target) < target.radius():
+                    self.travel_towards_target_direct(unit, dashable=False)
+
+                # if we are at the target, then we will do our specified action
+                if self.distance_between(unit, target) < target.radius():
+                    # do the action
+
+                    if target.body_type() == 'asteroid':
+                        # mine if we have capacity, flee back home if not
+                        if unit.capacity_left() < self.game().mining_speed():
+                            unit.mine(target)
+                        else:
+                            self.targets[unit] = player().home_base()
+                
+                    elif target.body_type() == 'planet':
+                        # let off resources and rest to regain some energy if needed
+                        self.targets[unit]=None
+                
+                    # final push to get to the resources we need
+
+
+            else:
+                #other logic
+
         # Put your game logic here for runTurn
         return True
         # <<-- /Creer-Merge: runTurn -->>
@@ -147,13 +200,23 @@ class AI(BaseAI):
         return game.dash_distance() * ((energy + 1) / game.dash_cost())   
     
     # Return to planet function
-    def travel_towards_base_direct(self, unit, min_retaining_energy=21):
+    def travel_towards_base_direct(self, unit, min_retaining_energy=21, dashable=True):
         """ Sends the given unit back towards its base"""
         home_base = unit.owner().home_base()
-        return travel_towards_location_direct(unit, home_base.x(), home_base.y(), home_base.radius(), min_retaining_energy)
+        return travel_towards_location_direct(unit, home_base.x(), home_base.y(), home_base.radius(), min_retaining_energy, dashable)
+
+    # travel direct to target
+    def travel_towards_target_direct(self, unit, min_retaining_energy=21, dashable=True):
+        """ Sends the unit towards its given target in the self.targets table"""
+        target = targets[unit]
+        if target:
+            return travel_towards_location_direct(unit, target.x(), target.y(), target.radius(), min_retaining_energy, dashable)
+        else:
+            return None
+
 
     # Generalized traveling function
-    def travel_towards_location_direct(self, unit, x, y, r=0, min_retaining_energy=21):
+    def travel_towards_location_direct(self, unit, x, y, r=0, min_retaining_energy=21, dashable=True):
         """ Sends the given unit back towards a specified location
         
             unit: unit to move
@@ -179,7 +242,7 @@ class AI(BaseAI):
             unit.move(direction[0] * distance, direction[1] * distance)
         
         #if not, we will check if we can make it with a dash
-        elif distance <= max_dashable_dist + max_dist_without_dash:
+        elif distance <= max_dashable_dist + max_dist_without_dash and dashable:
             unit.move(direction[0] * max_dist_without_dash, direction[1] * distance)
             unit.dash(direction[0] * (distance - max_dist_without_dash),
                       direction[1] * (distance - max_dist_without_dash))
