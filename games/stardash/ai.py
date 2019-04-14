@@ -93,11 +93,11 @@ class AI(BaseAI):
                 if not target:
                     choice = None
                     choices = ['legendarium','rarium','genarium', None] if turns_to_mine_mythicite() > 1 else ['mythicite', 'legendarium','rarium','genarium', None]
-                    for oretype in ['legendarium','rarium','genarium', None]:
+                    for oretype in choices:
                         if choice:
                             break
                         else:
-                        choice = closest_asteroid_to_position((unit.x(), unit.y()), n=3, asteroid_type=oretype, min_res=20)
+                            choice = closest_asteroid_to_position((unit.x(), unit.y()), n=3, asteroid_type=oretype, min_res=20)
                     self.targets[unit] = choice
 
                 # target is now set
@@ -126,6 +126,7 @@ class AI(BaseAI):
 
             else:
                 #other logic
+                pass
 
         # Put your game logic here for runTurn
         return True
