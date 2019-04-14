@@ -157,7 +157,7 @@ class AI(BaseAI):
         Going from (initx, inity) to (destx, desty)
         """
         diff = (destx-initx, desty-inity)
-        magnitude = distance(0, 0, diff[0], diff[1])
+        magnitude = self.distance(0, 0, diff[0], diff[1])
         return (diff[0]/magnitude, diff[1]/magnitude)  # unit vector
 
 
@@ -179,16 +179,16 @@ class AI(BaseAI):
         
         # current list of asteroids of a certain type passed by parameter
         asteroids_of_type = [x for x in self.game.bodies 
-            if x.body_type == 'asteroid' and 
-            ((not x.material_type) or (x.material_type == asteroid_type)) and
-            x.amount() > min_res]
+            if x.body_type == 'asteroid' and x.amount > min_res]
+        if asteroid_type:
+            asteroids_of_type = [x for x in asteroids_of_type if x.material_type == asteroid_type]
 
         # return that which is the smallest one
         min_dist=None
         min_asteroid=None
         for asteroid in asteroids_of_type:
-            dist = distance(position[0], position[1], asteroid.next_x(n), asteroid.next_y(n))
-            if (not dist) or (dist < min_dist):
+            dist = self.distance(position[0], position[1], asteroid.next_x(n), asteroid.next_y(n))
+            if (not min_dist) or (dist < min_dist):
                 min_dist = dist
                 min_asteroid = asteroid
         return min_asteroid
@@ -263,7 +263,7 @@ class AI(BaseAI):
         planet_y = player.home_base.y
         planet_radius = player.home_base.radius
         spawn_x = planet_x+(planet_radius if planet_x<0 else 0-planet_radius)
-        while(player.home_base.amount>200):
+        while(player.money>200):
             player.home_base.spawn(spawn_x,planet_y,"miner")
         return
 
