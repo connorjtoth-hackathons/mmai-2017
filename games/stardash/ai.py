@@ -264,7 +264,7 @@ class AI(BaseAI):
         planet_radius = player.home_base.radius
         spawn_x = planet_x+(planet_radius if planet_x<0 else 0-planet_radius)
         while(player.home_base.amount>200):
-            player.home_base.spawn(spawn_x,y,"miner")
+            player.home_base.spawn(spawn_x,planet_y,"miner")
         return
 
     def attackFleet(self,units):
