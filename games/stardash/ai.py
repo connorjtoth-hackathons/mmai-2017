@@ -192,7 +192,8 @@ class AI(BaseAI):
 
     ## TOTH  HELPER FUNCTIONS ^^^^^^
     ## SAUER HELPER FUNCTIONS VVVVVV
-    
+    def buyFleet():
+        return
 
     def attackFleet(units):
         x,y
