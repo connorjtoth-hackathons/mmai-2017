@@ -67,10 +67,12 @@ class AI(BaseAI):
         # <<-- /Creer-Merge: end -->>
     def run_turn(self):
         """ This is called every time it is this AI.player's turn.
-
         Returns:
             bool: Represents if you want to end your turn. True means end your turn, False means to keep your turn going and re-call this function.
         """
+        buyFleet()
+        for unit in player.units:
+            pass
         # <<-- Creer-Merge: runTurn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         # Put your game logic here for runTurn
         return True
@@ -193,12 +195,12 @@ class AI(BaseAI):
     ## TOTH  HELPER FUNCTIONS ^^^^^^
     ## SAUER HELPER FUNCTIONS VVVVVV
     def buyFleet():
-        planet_x = self.game.current_player.home_base.x
-        planet_x = self.game.current_player.home_base.y
-        planet_radius = self.game.current_player.home_base.radius
+        planet_x = player.home_base.x
+        planet_x = player.home_base.y
+        planet_radius = player.home_base.radius
         spawn_x = planet_x+(planet_radius if planet_x< else 0-planet_radius)
-        while(self.game.current_player.home_base.amount>200):
-            self.game.current_player.home_base.spawn(x+,y,"miner")
+        while(player.home_base.amount>200):
+            player.home_base.spawn(x+,y,"miner")
         return
 
     def attackFleet(units):
