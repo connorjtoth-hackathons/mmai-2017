@@ -79,12 +79,12 @@ class AI(BaseAI):
         Returns:
             bool: Represents if you want to end your turn. True means end your turn, False means to keep your turn going and re-call this function.
         """
-        buyFleet()
-        for unit in player.units:
-            pass
+
         # <<-- Creer-Merge: runTurn -->> - Code you add between this comment and the end comment will be preserved between Creer re-runs.
         
         # 
+
+        buyFleet()
         for unit in player().units():
             if unit.job().title() == 'miner':
                 # mining logic
