@@ -84,20 +84,20 @@ class AI(BaseAI):
         
         # 
 
-        buyFleet()
-        for unit in player.units:
+        self.buyFleet()
+        for unit in self.player.units:
             if unit.job.title == 'miner':
                 # mining logic
                 target = self.targets[unit]
 
                 if not target:
                     choice = None
-                    choices = ['legendarium','rarium','genarium', None] if turns_to_mine_mythicite() > 1 else ['mythicite', 'legendarium','rarium','genarium', None]
+                    choices = ['legendarium','rarium','genarium', None] if self.turns_to_mine_mythicite() > 1 else ['mythicite', 'legendarium','rarium','genarium', None]
                     for oretype in ['legendarium','rarium','genarium', None]:
                         if choice:
                             break
                         else:
-                        choice = closest_asteroid_to_position((unit.x, unit.y), n=3, asteroid_type=oretype, min_res=20)
+                        choice = self.closest_asteroid_to_position((unit.x, unit.y), n=3, asteroid_type=oretype, min_res=20)
                     self.targets[unit] = choice
 
                 # target is now set
@@ -115,7 +115,7 @@ class AI(BaseAI):
                         if unit.capacity_left < self.game.mining_speed:
                             unit.mine(target)
                         else:
-                            self.targets[unit] = player.home_base
+                            self.targets[unit] = self.player.home_base
                 
                     elif target.body_type == 'planet':
                         # let off resources and rest to regain some energy if needed
@@ -140,7 +140,7 @@ class AI(BaseAI):
     def turns_to_mine_mythicite(self):
         """ Returns bool: if we can mine mythicite
         """
-        return self.game.current_turn - this.game.orbits_protected + 1
+        return self.game.current_turn - self.game.orbits_protected + 1
 
     def distance(self, objx, objy, obj2x, obj2y):
         """
@@ -195,22 +195,22 @@ class AI(BaseAI):
     
     # calculate maximum distance given a certain amount of energy to use
     def max_dash_dist_with_energy(self,energy):
-        """ """
-        game = self.game()
-        return game.dash_distance() * ((energy + 1) / game.dash_cost())   
+        """ This is a comment """
+        game = self.game
+        return game.dash_distance * ((energy + 1) / game.dash_cost) 
     
     # Return to planet function
     def travel_towards_base_direct(self, unit, min_retaining_energy=21, dashable=True):
         """ Sends the given unit back towards its base"""
         home_base = unit.owner.home_base
-        return travel_towards_location_direct(unit, home_base.x, home_base.y, home_base.radius, min_retaining_energy, dashable)
+        return self.travel_towards_location_direct(unit, home_base.x, home_base.y, home_base.radius, min_retaining_energy, dashable)
 
     # travel direct to target
     def travel_towards_target_direct(self, unit, min_retaining_energy=21, dashable=True):
         """ Sends the unit towards its given target in the self.targets table"""
-        target = targets[unit]
+        target = self.targets[unit]
         if target:
-            return travel_towards_location_direct(unit, target.x, target.y, target.radius, min_retaining_energy, dashable)
+            return self.travel_towards_location_direct(unit, target.x, target.y, target.radius, min_retaining_energy, dashable)
         else:
             return None
 
@@ -226,14 +226,14 @@ class AI(BaseAI):
         """
 
         # direction of the base from us
-        direction = direction(unit.x, unit.y, x, y)
-        distance = distance(unit.x, unit.y, x, y) - r + 1
+        direction = self.direction(unit.x, unit.y, x, y)
+        distance = self.distance(unit.x, unit.y, x, y) - r + 1
 
         max_dist_without_dash = unit.moves
         energy_without_dash = unit.energy
 
         max_dashing_energy = energy_without_dash - min_retaining_energy
-        max_dashable_dist = max_dash_dist_with_energy(max_dashing_energy)
+        max_dashable_dist = self.max_dash_dist_with_energy(max_dashing_energy)
 
 
         # check if the distance can be made without a dash
@@ -258,6 +258,7 @@ class AI(BaseAI):
     ## TOTH  HELPER FUNCTIONS ^^^^^^
     ## SAUER HELPER FUNCTIONS VVVVVV
     def buyFleet(self):
+        player = self.player
         planet_x = player.home_base.x
         planet_x = player.home_base.y
         planet_radius = player.home_base.radius
@@ -273,7 +274,7 @@ class AI(BaseAI):
             y+=unit.y
         x/=len(unit)
         x/=len(unit)
-        players = game.players
+        players = self.game.players
         enemy = (players[0] if players[0] != units[0].owner() else players[1])
 
         for unit in units:
