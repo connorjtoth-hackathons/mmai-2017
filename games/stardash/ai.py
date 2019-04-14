@@ -47,7 +47,7 @@ class AI(BaseAI):
         # status: returning, arriving, mining
         
         # maps (unit) -> (asteroid) that it should be mining or (unit) -> (base) if returning
-        self.targets = {unit : None for unit in self.player().units()}
+        self.targets = {unit : None for unit in self.player.units()}
         
         
         
