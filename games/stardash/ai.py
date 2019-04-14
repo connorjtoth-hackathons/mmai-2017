@@ -83,14 +83,44 @@ class AI(BaseAI):
 
     def turns_to_mine_mythicite(self):
         """ Returns bool: if we can mine mythicite"""
-        if self.game().turns_to_orbit():
+        if self.game().turns_to_orbit()
             pass
-            
 
-    # Closest X type of asteroid to the miner
-    def closest_asteroid_to_miner(self, miner, asteroid_type=None):
+    def distance(self, objx, objy, obj2x, obj2y):
         """
         """
+        return math.sqrt((objx - obj2x) ** 2 + (objy - obj2y) ** 2)
+
+
+    # Closest X type of asteroid to the miner in n turns
+    def closest_asteroid_to_position(self, position, n=0, asteroid_type=None, min_res=0):
+        """
+        position: a tuple (x, y) for the location of the position to calculate from
+        n: the number of turns to calculate from now (default: 0)
+        asteroid_type: the material type of asteroid to look for (default: any)
+        min_res: the minimum acceptable number of resources acceptable on an asteroid
+                 for consideration (default: 0)
+        """
+
+        # current unit is at position (x, y)
+        x, y = position[0], position[1]
+        
+        # current list of asteroids of a certain type passed by parameter
+        asteroids_of_type = [x for x in self.game().bodies() 
+            if x.body_type() == 'asteroid' and 
+            ((not x.material_type()) or (x.material_type() == asteroid_type)) and
+            x.amount() > min_res]
+
+        # return that which is the smallest one
+        min_dist=None
+        min_asteroid=None
+        for asteroid in asteroids_of_type:
+            dist = distance(position[0], position[1], asteroid.next_x(n), asteroid.next_y(n))
+            if (not dist) or (dist < min_dist):
+                min_dist = dist
+                min_asteroid = asteroid
+        return min_asteroid
+
         pass
     
 
