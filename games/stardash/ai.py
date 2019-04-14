@@ -193,6 +193,12 @@ class AI(BaseAI):
     ## TOTH  HELPER FUNCTIONS ^^^^^^
     ## SAUER HELPER FUNCTIONS VVVVVV
     def buyFleet():
+        planet_x = self.game.current_player.home_base.x
+        planet_x = self.game.current_player.home_base.y
+        planet_radius = self.game.current_player.home_base.radius
+        spawn_x = planet_x+(planet_radius if planet_x< else 0-planet_radius)
+        while(self.game.current_player.home_base.amount>200):
+            self.game.current_player.home_base.spawn(x+,y,"miner")
         return
 
     def attackFleet(units):
@@ -205,7 +211,7 @@ class AI(BaseAI):
         players = game.players()
         enemy = (players[0] if players[0] != units[0].owner() else players[1])
 
-        for unit in units:
+        for unit in units
             unit.move()
         return
 
