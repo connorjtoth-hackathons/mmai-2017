@@ -126,7 +126,7 @@ class AI(BaseAI):
 
             else:
                 #other logic
-
+                pass
         # Put your game logic here for runTurn
         return True
         # <<-- /Creer-Merge: runTurn -->>
