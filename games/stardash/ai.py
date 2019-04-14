@@ -47,7 +47,7 @@ class AI(BaseAI):
         # status: returning, arriving, mining
         
         # maps (unit) -> (asteroid) that it should be mining or (unit) -> (base) if returning
-        self.targets = {unit : None for unit in self.player.units()}
+        self.targets = {unit : None for unit in self.player.units}
         
         
         
@@ -85,8 +85,8 @@ class AI(BaseAI):
         # 
 
         buyFleet()
-        for unit in player().units():
-            if unit.job().title() == 'miner':
+        for unit in player.units:
+            if unit.job.title == 'miner':
                 # mining logic
                 target = self.targets[unit]
 
@@ -97,27 +97,27 @@ class AI(BaseAI):
                         if choice:
                             break
                         else:
-                            choice = closest_asteroid_to_position((unit.x(), unit.y()), n=3, asteroid_type=oretype, min_res=20)
+                            choice = closest_asteroid_to_position((unit.x, unit.y, n=3, asteroid_type=oretype, min_res=20)
                     self.targets[unit] = choice
 
                 # target is now set
 
                 # first, we try to reach the target if we are not with it anymore
-                if not self.distance_between(unit, target) < target.radius():
+                if not self.distance_between(unit, target) < target.radius:
                     self.travel_towards_target_direct(unit, dashable=False)
 
                 # if we are at the target, then we will do our specified action
-                if self.distance_between(unit, target) < target.radius():
+                if self.distance_between(unit, target) < target.radius:
                     # do the action
 
-                    if target.body_type() == 'asteroid':
+                    if target.body_type == 'asteroid':
                         # mine if we have capacity, flee back home if not
-                        if unit.capacity_left() < self.game().mining_speed():
+                        if unit.capacity_left() < self.game.mining_speed:
                             unit.mine(target)
                         else:
                             self.targets[unit] = player().home_base()
                 
-                    elif target.body_type() == 'planet':
+                    elif target.body_type == 'planet':
                         # let off resources and rest to regain some energy if needed
                         self.targets[unit]=None
                 
@@ -141,7 +141,7 @@ class AI(BaseAI):
     def turns_to_mine_mythicite(self):
         """ Returns bool: if we can mine mythicite
         """
-        return self.game().current_turn() - this.game.orbits_protected() + 1
+        return self.game.current_turn - this.game.orbits_protected + 1
 
     def distance(self, objx, objy, obj2x, obj2y):
         """
@@ -151,7 +151,7 @@ class AI(BaseAI):
     def distance_between(self, obj, obj2):
         """
         """
-        return math.sqrt((obj.x() - obj2.x()) ** 2 + (obj.y() - obj2.y()) ** 2)
+        return math.sqrt((obj.x - obj2.x) ** 2 + (obj.y - obj2.y) ** 2)
 
     def direction(self, initx, inity, destx, desty):
         """
@@ -179,10 +179,10 @@ class AI(BaseAI):
         x, y = position[0], position[1]
         
         # current list of asteroids of a certain type passed by parameter
-        asteroids_of_type = [x for x in self.game().bodies() 
+        asteroids_of_type = [x for x in self.game.bodies
             if x.body_type() == 'asteroid' and 
-            ((not x.material_type()) or (x.material_type() == asteroid_type)) and
-            x.amount() > min_res]
+            ((not x.material_type) or (x.material_type == asteroid_type)) and
+            x.amount > min_res]
 
         # return that which is the smallest one
         min_dist=None
@@ -195,23 +195,23 @@ class AI(BaseAI):
         return min_asteroid
     
     # calculate maximum distance given a certain amount of energy to use
-    def max_dash_dist_with_energy(self,energy):
+    def max_dash_dist_with_energy(self, energy):
         """ """
-        game = self.game()
-        return game.dash_distance() * ((energy + 1) / game.dash_cost())   
+        game = self.game
+        return game.dash_distance * ((energy + 1) / game.dash_cost)   
     
     # Return to planet function
     def travel_towards_base_direct(self, unit, min_retaining_energy=21, dashable=True):
         """ Sends the given unit back towards its base"""
-        home_base = unit.owner().home_base()
-        return travel_towards_location_direct(unit, home_base.x(), home_base.y(), home_base.radius(), min_retaining_energy, dashable)
+        home_base = unit.owner.home_base
+        return travel_towards_location_direct(unit, home_base.x, home_base.y, home_base.radius, min_retaining_energy, dashable)
 
     # travel direct to target
     def travel_towards_target_direct(self, unit, min_retaining_energy=21, dashable=True):
         """ Sends the unit towards its given target in the self.targets table"""
         target = targets[unit]
         if target:
-            return travel_towards_location_direct(unit, target.x(), target.y(), target.radius(), min_retaining_energy, dashable)
+            return travel_towards_location_direct(unit, target.x, target.y, target.radius, min_retaining_energy, dashable)
         else:
             return None
 
@@ -227,11 +227,11 @@ class AI(BaseAI):
         """
 
         # direction of the base from us
-        direction = direction(unit.x(), unit.y(), x, y)
-        distance = distance(unit.x(), unit.y(), x, y) - r + 1
+        direction = direction(unit.x, unit.y, x, y)
+        distance = distance(unit.x, unit.y, x, y) - r + 1
 
-        max_dist_without_dash = unit.moves()
-        energy_without_dash = unit.energy()
+        max_dist_without_dash = unit.moves
+        energy_without_dash = unit.energy
 
         max_dashing_energy = energy_without_dash - min_retaining_energy
         max_dashable_dist = max_dash_dist_with_energy(max_dashing_energy)
@@ -259,22 +259,22 @@ class AI(BaseAI):
     ## TOTH  HELPER FUNCTIONS ^^^^^^
     ## SAUER HELPER FUNCTIONS VVVVVV
     def buyFleet():
-        planet_x = player().home_base().x()
-        planet_x = player().home_base().y()
-        planet_radius = player().home_base().radius()
+        planet_x = player.home_base.x
+        planet_x = player.home_base.y
+        planet_radius = player.home_base.radius
         spawn_x = planet_x + (planet_radius if planet_x < 0 else 0-planet_radius)
-        while(player().home_base().amount()>200):
-            player().home_base().spawn(spawn_x,y,"miner")
+        while(player.home_base.amount>200):
+            player.home_base.spawn(spawn_x,y,"miner")
         return
 
     def attackFleet(units):
         x,y
         for unit in units:
-            x+=unit.x()
-            y+=unit.y()
+            x+=unit.x
+            y+=unit.y
         x/=len(unit)
         x/=len(unit)
-        players = game().players()
+        players = game.players
         enemy = (players[0] if players[0] != units[0].owner() else players[1])
 
         for unit in units:
