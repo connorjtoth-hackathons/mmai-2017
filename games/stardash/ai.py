@@ -192,7 +192,20 @@ class AI(BaseAI):
 
     ## TOTH  HELPER FUNCTIONS ^^^^^^
     ## SAUER HELPER FUNCTIONS VVVVVV
+    
 
+    def attackFleet(units):
+        x,y
+        for unit in units:
+            x+=unit.x()
+            y+=unit.y()
+        x/=len(unit)
+        x/=len(unit)
+        players = game.players()
+        enemy = (players[0] if players[0] != units[0].owner() else players[1])
 
+        for unit in units:
+            unit.move()
+        return
 
     # <<-- /Creer-Merge: functions -->>
