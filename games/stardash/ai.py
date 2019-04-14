@@ -83,14 +83,28 @@ class AI(BaseAI):
 
 
     def turns_to_mine_mythicite(self):
-        """ Returns bool: if we can mine mythicite"""
-        if self.game().turns_to_orbit()
-            pass
+        """ Returns bool: if we can mine mythicite
+        """
+        return self.game().current_turn() - this.game.orbits_protected() + 1
 
     def distance(self, objx, objy, obj2x, obj2y):
         """
         """
         return math.sqrt((objx - obj2x) ** 2 + (objy - obj2y) ** 2)
+
+    def distance_between(self, obj, obj2):
+        """
+        """
+        return math.sqrt((obj.x() - obj2.x()) ** 2 + (obj.y() - obj2.y()) ** 2)
+
+    def direction(self, initx, inity, destx, desty):
+        """
+        Going from (initx, inity) to (destx, desty)
+        """
+        diff = (destx-initx, desty-inity)
+        magnitude = distance(0, 0, diff[0], diff[1])
+        return (diff[0]/magnitude, diff[1]/magnitude)  # unit vector
+
 
 
     # Closest X type of asteroid to the miner in n turns
@@ -101,6 +115,8 @@ class AI(BaseAI):
         asteroid_type: the material type of asteroid to look for (default: any)
         min_res: the minimum acceptable number of resources acceptable on an asteroid
                  for consideration (default: 0)
+
+        RETURNS: asteroid that is closest and meets parameters
         """
 
         # current unit is at position (x, y)
@@ -122,9 +138,55 @@ class AI(BaseAI):
                 min_asteroid = asteroid
         return min_asteroid
     
+    # calculate maximum distance given a certain amount of energy to use
+    def max_dash_dist_with_energy(self,energy):
+        """ """
+        game = self.game()
+        return game.dash_distance() * ((energy + 1) / game.dash_cost())   
+    
     # Return to planet function
-    def travel_towards_base_direct(self, unit):
+    def travel_towards_base_direct(self, unit, min_retaining_energy=21):
+        """ Sends the given unit back towards its base"""
         home_base = unit.owner().home_base()
+        return travel_towards_location_direct(unit, home_base.x(), home_base.y(), home_base.radius(), min_retaining_energy)
+
+    # Generalized traveling function
+    def travel_towards_location_direct(self, unit, x, y, r=0, min_retaining_energy=21):
+        """ Sends the given unit back towards a specified location
+        
+            unit: unit to move
+            x,y: location to move to
+            r: radius needed to be within for the given position to be valid (default: 0)
+            min_retaining_energy: the amount of energy we require be available at the end of travel (default: 21)
+        """
+
+        # direction of the base from us
+        direction = direction(unit.x(), unit.y(), x, y)
+        distance = distance(unit.x(), unit.y(), x, y) - r + 1
+
+        max_dist_without_dash = unit.moves()
+        energy_without_dash = unit.energy()
+
+        max_dashing_energy = energy_without_dash - min_retaining_energy
+        max_dashable_dist = max_dash_dist_with_energy(max_dashing_energy)
+
+
+        # check if the distance can be made without a dash
+        if distance <= max_dist_without_dash:
+            # we can move without a dash and we will
+            unit.move(direction[0] * distance, direction[1] * distance)
+        
+        #if not, we will check if we can make it with a dash
+        elif distance <= max_dashable_dist + max_dist_without_dash:
+            unit.move(direction[0] * max_dist_without_dash, direction[1] * distance)
+            unit.dash(direction[0] * (distance - max_dist_without_dash),
+                      direction[1] * (distance - max_dist_without_dash))
+
+        # otherwise, we will simply go towards it
+        else:
+            unit.move(direction[0] * max_dist_without_dash, direction[1] * max_dist_without_dash)
+
+
         
 
 
