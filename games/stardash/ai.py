@@ -97,7 +97,7 @@ class AI(BaseAI):
                         if choice:
                             break
                         else:
-                        choice = closest_asteroid_to_position((unit.x(), unit.y()), n=3, asteroid_type=oretype, min_res=20)
+                        choice = closest_asteroid_to_position((unit.x, unit.y), n=3, asteroid_type=oretype, min_res=20)
                     self.targets[unit] = choice
 
                 # target is now set
