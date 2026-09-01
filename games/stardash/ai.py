@@ -91,14 +91,13 @@ class AI(BaseAI):
                 target = self.targets[unit]
 
                 if not target:
-                    choice = None
                     choices = ['legendarium','rarium','genarium', None] if self.turns_to_mine_mythicite() > 1 else ['mythicite', 'legendarium','rarium','genarium', None]
                     for oretype in ['legendarium','rarium','genarium', None]:
-                        if choice:
+                        if target:
                             break
                         else:
-                        choice = self.closest_asteroid_to_position((unit.x, unit.y), n=3, asteroid_type=oretype, min_res=20)
-                    self.targets[unit] = choice
+                        target = self.closest_asteroid_to_position((unit.x, unit.y), n=3, asteroid_type=oretype, min_res=20)
+                    self.targets[unit] = target
 
                 # target is now set
 
@@ -157,7 +156,7 @@ class AI(BaseAI):
         Going from (initx, inity) to (destx, desty)
         """
         diff = (destx-initx, desty-inity)
-        magnitude = self.distance(0, 0, diff[0], diff[1])
+        magnitude = distance(0, 0, diff[0], diff[1])
         return (diff[0]/magnitude, diff[1]/magnitude)  # unit vector
 
 
@@ -179,16 +178,16 @@ class AI(BaseAI):
         
         # current list of asteroids of a certain type passed by parameter
         asteroids_of_type = [x for x in self.game.bodies 
-            if x.body_type == 'asteroid' and x.amount > min_res]
-        if asteroid_type:
-            asteroids_of_type = [x for x in asteroids_of_type if x.material_type == asteroid_type]
+            if x.body_type == 'asteroid' and 
+            ((not x.material_type) or (x.material_type == asteroid_type)) and
+            x.amount() > min_res]
 
         # return that which is the smallest one
         min_dist=None
         min_asteroid=None
         for asteroid in asteroids_of_type:
-            dist = self.distance(position[0], position[1], asteroid.next_x(n), asteroid.next_y(n))
-            if (not min_dist) or (dist < min_dist):
+            dist = distance(position[0], position[1], asteroid.next_x(n), asteroid.next_y(n))
+            if (not dist) or (dist < min_dist):
                 min_dist = dist
                 min_asteroid = asteroid
         return min_asteroid
@@ -206,11 +205,11 @@ class AI(BaseAI):
         return self.travel_towards_location_direct(unit, home_base.x, home_base.y, home_base.radius, min_retaining_energy, dashable)
 
     # travel direct to target
-    def travel_towards_target_direct(self, unit, min_retaining_energy=21, dashable=True):
+    def travel_towards_target_direct(self, unit, n=0, min_retaining_energy=21, dashable=True):
         """ Sends the unit towards its given target in the self.targets table"""
         target = self.targets[unit]
         if target:
-            return self.travel_towards_location_direct(unit, target.x, target.y, target.radius, min_retaining_energy, dashable)
+            return self.travel_towards_location_direct(unit, target.next_x(n), target.next_y(n), target.radius, min_retaining_energy, dashable)
         else:
             return None
 
@@ -262,9 +261,9 @@ class AI(BaseAI):
         planet_x = player.home_base.x
         planet_y = player.home_base.y
         planet_radius = player.home_base.radius
-        spawn_x = planet_x+(planet_radius if planet_x<0 else 0-planet_radius)
-        while(player.money>200):
-            player.home_base.spawn(spawn_x,planet_y,"miner")
+        spawn_x = planet_x+(planet_radius if planet_x < 0 else -planet_radius)
+        while(player.home_base.amount>200):
+            player.home_base.spawn(spawn_x,y,"miner")
         return
 
     def attackFleet(self,units):
